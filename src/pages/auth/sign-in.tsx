@@ -2,8 +2,10 @@ import { Button, Form, Input} from "antd";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { authService } from "../../service/auth.service";
+import { authService } from "@service";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { setItem } from "@helpers";
 
 // ✅ Yup orqali validatsiya sxemasi
 const schema = yup
@@ -20,7 +22,8 @@ const schema = yup
   .required();
 
 const SignIn = () => {
-    const [role, setRole] = useState('')
+
+  const [role, setRole] = useState('')
   const {
     register,
     handleSubmit,
@@ -30,9 +33,15 @@ const SignIn = () => {
     resolver: yupResolver(schema),
   });
 
-  const submit = (values: any) => {
+  const navigate = useNavigate()
+  const submit = async (values: any) => {
     console.log("Yuborilayotgan payload:", values, role);
-    authService.signIn(values, role);
+    const res = await authService.signIn(values, role);
+    if(res.status===201){
+      setItem("access_token", res.data.access_token)
+      setItem("role", role)
+      navigate(`/${role}`)
+    }
   };
 
   return (

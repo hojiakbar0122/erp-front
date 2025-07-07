@@ -21,8 +21,28 @@ export function apiConfig() {
             Notification("error", err?.message)
         }
     }
+
+    async function putRequest(url:string, body:object={}) {
+        try {
+            const res = await axiosInstance.put(url, body)
+            return res
+        } catch (err:any) {
+            Notification("error", err?.message)
+        }
+    }
+
+    async function deleteRequest(url:string, params:object={}) {
+        try {
+            const res = await axiosInstance.put(url, {params})
+            return res
+        } catch (err:any) {
+            Notification("error", err?.message)
+        }
+    }
     return{
         getRequest,
-        postRequest
+        postRequest,
+        putRequest,
+        deleteRequest
     }
 }

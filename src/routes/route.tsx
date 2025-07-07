@@ -1,6 +1,6 @@
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom"
 import App from "../App"
-import { SignIn, SignUp, NotFound } from "@pages"
+import { SignIn, SignUp, NotFound, StudentLayout, TeacherLayout, AdminLayout, Groups } from "@pages"
 
 const Router = ()=>{
     const router = createBrowserRouter(
@@ -8,6 +8,23 @@ const Router = ()=>{
             <Route path="/" element={<App/>}>
                 <Route index element={<SignIn/>}/>
                 <Route path="sign-up" element={<SignUp/>}/>
+
+                {/* ADMIN LAYOUT */}
+                <Route path="admin" element={<AdminLayout/>}>
+                    <Route path="groups" element={<Groups/>}/>
+                    <Route path="courses" element={<Groups/>}/>
+                </Route>
+
+                {/* TEACHER LAYOUT */}
+                <Route path="teacher" element={<TeacherLayout/>}>
+                </Route>
+
+                {/* STUDENT LAYOUT */}
+                <Route path="student" element={<StudentLayout/>}>
+                
+
+                </Route>
+
                 <Route path="*" element={<NotFound/>}/>
             </Route>
         )
