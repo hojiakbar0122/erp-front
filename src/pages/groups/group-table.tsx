@@ -71,7 +71,8 @@ const GroupTable: React.FC = () => {
   };
 
   const handleDelete = async (record: DataType) => {
-    await groupService.deleteGroup(record.id);
+    console.log(record);
+    await groupService.deleteGroup(record.id);    
     message.success("Gruppa o‘chirildi");
     getData(currentPage, pageSize);
   };
