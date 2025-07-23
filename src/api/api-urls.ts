@@ -3,8 +3,8 @@ export class ApiUrls{
     public static AUTH:string="/log-in"
 
     // GET GROUPS
-    public static GET_GROUPS:string="/group"
+    public static GROUPS:string="/group"
 
     // COURSE
-    public static GET_COURSE:string="/courses"
+    public static COURSE:string="/courses"
 }

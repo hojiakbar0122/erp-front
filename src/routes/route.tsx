@@ -1,18 +1,18 @@
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom"
 import App from "../App"
-import { SignIn, SignUp, NotFound, StudentLayout, TeacherLayout, AdminLayout, Groups } from "@pages"
+import { SignIn, SignUp, NotFound, StudentLayout, TeacherLayout, AdminLayout, Groups, LayoutProtected, LoginProtected, Worker, Course } from "@pages"
 
 const Router = ()=>{
     const router = createBrowserRouter(
         createRoutesFromElements(
             <Route path="/" element={<App/>}>
-                <Route index element={<SignIn/>}/>
+                <Route index element={<LoginProtected><SignIn/></LoginProtected>}/>
                 <Route path="sign-up" element={<SignUp/>}/>
 
                 {/* ADMIN LAYOUT */}
-                <Route path="admin" element={<AdminLayout/>}>
+                <Route path="admin" element={<LayoutProtected><AdminLayout/></LayoutProtected>}>
                     <Route path="groups" element={<Groups/>}/>
-                    <Route path="courses" element={<Groups/>}/>
+                    <Route path="courses" element={<Course/>}/>
                 </Route>
 
                 {/* TEACHER LAYOUT */}
@@ -25,6 +25,7 @@ const Router = ()=>{
 
                 </Route>
 
+                <Route path="worker" element={<Worker/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Route>
         )

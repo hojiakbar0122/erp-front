@@ -7,8 +7,8 @@ import {
 } from "@ant-design/icons";
 import { Button, Menu } from "antd";
 import type { MenuProps } from "antd";
-import GroupTable from "./group-table";
-import CourseTable from "./course-table";
+import Groups from "../groups/groups";
+import Course from "../course/course";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -40,6 +40,7 @@ const App: React.FC = () => {
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
+      
       <div
         style={{
           width: collapsed ? 80 : 256,
@@ -52,6 +53,7 @@ const App: React.FC = () => {
           <Button type="primary" onClick={toggleCollapsed}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </Button>
+          
         </div>
 
         <Menu
@@ -74,8 +76,8 @@ const App: React.FC = () => {
           overflowY: "auto",
         }}
       >
-        {selectedKey === "groups" && <GroupTable />}
-        {selectedKey === "courses" && <CourseTable />}
+        {selectedKey === "groups" && <Groups />}
+        {selectedKey === "courses" && <Course />}
       </div>
     </div>
   );

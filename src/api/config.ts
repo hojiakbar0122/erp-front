@@ -33,7 +33,7 @@ export function apiConfig() {
 
     async function deleteRequest(url:string, params:object={}) {
         try {
-            const res = await axiosInstance.put(url, {params})
+            const res = await axiosInstance.delete(url, {params})
             return res
         } catch (err:any) {
             Notification("error", err?.message)
