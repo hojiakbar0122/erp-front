@@ -1,6 +1,7 @@
 export interface Group{
     name:string,
-    group_id:number,
+    courseId:number,
+    roomId:number,
     status:string,
     start_date:string,
     end_date:string

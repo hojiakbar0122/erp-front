@@ -7,6 +7,7 @@ import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import GroupModal from "./group-modal";
 import dayjs from "dayjs";
+import { Tag } from "antd";
 
 interface DataType {
   id: number;
@@ -14,6 +15,9 @@ interface DataType {
   start_date: string;
   end_date: string;
   course: object;
+  status:string
+  roomId:number
+  start_time:string
 }
 
 const GroupTable: React.FC = () => {
@@ -32,12 +36,16 @@ const GroupTable: React.FC = () => {
     setLoading(true);
     try {
       const res = await groupService.getGroups({ page, limit }); // ← query bilan
+      
       const transformed = res?.data.data.map((item: any, index: number) => ({
         id: item.id || index,
         name: item.name || "No name",
         start_date: item.start_date || "No start date",
         end_date: item.end_date || "No end date",
         course: item.course.title || "No end date",
+        start_time: item.start_time || "No end date",
+        status: item.status || "No end date",
+        // room: item.roomId || "No end date",
       }));
       setData(transformed);
       setTotal(res?.data.total);
@@ -52,7 +60,7 @@ const GroupTable: React.FC = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize);
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleAdd = () => {
     setEditingGroup(null);
@@ -62,50 +70,96 @@ const GroupTable: React.FC = () => {
 
   const handleEdit = (record: DataType) => {
     setEditingGroup(record);
+    console.log("record.roomId:", record);
     form.setFieldsValue({
       ...record,
       start_date: dayjs(record.start_date),
       end_date: dayjs(record.end_date),
+      start_time: dayjs(record.start_time, "HH:mm"),
+      status: record.status,
+      room: record.roomId,
     });
     setIsModalOpen(true);
   };
 
   const handleDelete = async (record: DataType) => {
+  try {
     await groupService.deleteGroup(record.id);    
     message.success("Gruppa o‘chirildi");
     getData(currentPage, pageSize);
-  };
+  } catch (error) {
+    console.error("Delete xatoligi:", error);
+    message.error("Gruppa o‘chirishda xatolik yuz berdi");
+  }
+};
 
-  const handleModalOk = async () => {
-    try {
-      const values = await form.validateFields();
-      console.log(values);
-      
-      const payload = {
-        ...values,
-        start_date: values.start_date.format("YYYY-MM-DD"),
-        end_date: values.end_date.format("YYYY-MM-DD"),
-      };
+ const handleModalOk = async () => {
+  try {
+    const values = await form.validateFields();
+    console.log("Form values:", values);
 
-      if (editingGroup?.id) {
-        await groupService.updateGroup(payload, editingGroup.id);
-        message.success("Gruppa yangilandi");
-      } else {
-        await groupService.createGroup(payload);
-        message.success("Gruppa qo‘shildi");
-      }
-      setIsModalOpen(false);
-      getData(currentPage, pageSize);
-    } catch (err) {
-      console.log("Xatolik:", err);
+    const payload = {
+      name: values.name,
+      courseId: typeof values.course === "object" ? values.course?.id : values.course,
+      roomId: typeof values.room === "object" ? values.room?.id : values.room,
+      status: values.status,
+      start_time: values.start_time.format("HH:mm"),
+      start_date: values.start_date.format("YYYY-MM-DD"),
+      end_date: values.end_date.format("YYYY-MM-DD"),
+    };
+
+    console.log("Yuborilayotgan payload:", payload);
+
+    if (editingGroup?.id) {
+      await groupService.updateGroup(payload, editingGroup.id);
+      message.success("Gruppa yangilandi");
+    } else {
+      await groupService.createGroup(payload);
+      message.success("Gruppa qo‘shildi");
     }
-  };
+
+    setIsModalOpen(false);
+    getData(currentPage, pageSize);
+  } catch (err) {
+    console.error("Modal ok xatolik:", err);
+    message.error("Formani to‘g‘ri to‘ldiring");
+  }
+};
+
+
 
   const columns: TableColumnsType<DataType> = [
     { title: "Name", dataIndex: "name" },
     { title: "Start date", dataIndex: "start_date" },
     { title: "End date", dataIndex: "end_date" },
     { title: "Course", dataIndex: "course" },
+    { title: "Start time", dataIndex: "start_time" },
+    {
+  title: "Status",
+  dataIndex: "status",
+  render: (status: string) => {
+    let color = "";
+    switch (status) {
+      case "active":
+        color = "green";
+        break;
+      case "pending":
+        color = "orange";
+        break;
+      case "completed":
+        color = "blue";
+        break;
+      case "cancelled":
+        color = "red";
+        break;
+      default:
+        color = "default";
+    }
+
+    return <Tag color={color}>{status.toUpperCase()}</Tag>;
+  },
+},
+
     {
       title: "Action",
       key: "action",
@@ -153,13 +207,16 @@ const GroupTable: React.FC = () => {
         dataSource={data}
         loading={loading}
         pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: total,
-          onChange: (page, size) => {
-            getData(page, size);
-          },
-        }}
+    current: currentPage,
+    pageSize: pageSize,
+    total: total,
+    showSizeChanger: true,
+    pageSizeOptions: ["5", "10", "20", "50"],
+    onChange: (page, size) => {
+      setCurrentPage(page);
+      setPageSize(size);
+    },
+  }}
         size="middle"
       />
 

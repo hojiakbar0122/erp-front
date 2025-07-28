@@ -1,22 +1,26 @@
-// pages/CourseTable.tsx
-
 import React, { useEffect, useState } from "react";
-import { Button, Divider, Popconfirm, Space, Table, message, Form } from "antd";
+import { Button, Divider, Form, message, Popconfirm, Space, Table } from "antd";
 import type { TableColumnsType } from "antd";
-import { courseService } from "@service";
-import CourseModal from "./course-modal";
-import type { Course } from "../../types/course";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
+import BranchModal from "./branch-modal";
+import { branchService } from "@service"; // Sizda mavjud branchService bo'lishi kerak
 
-const CourseTable: React.FC = () => {
-  const [data, setData] = useState<Course[]>([]);
+interface Branch {
+  id: number;
+  name: string;
+  address: string;
+  call_number: string;
+}
+
+const BranchTable: React.FC = () => {
+  const [data, setData] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [form] = Form.useForm();
 
-  // ✅ Pagination state
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
@@ -24,17 +28,15 @@ const CourseTable: React.FC = () => {
   const getData = async (page = 1, limit = 10) => {
     setLoading(true);
     try {
-      const res = await courseService.getCourse({ page, limit });
-      const transformed = res?.data.courses.map((item: any, index: number) => ({
-        key: item.id || index,
+      const res = await branchService.getBranches({ page, limit });
+      console.log(res);
+      
+      const transformed = res?.data.branch.map((item: any, index: number) => ({
+        key:index,
         id: item.id,
-        title: item.title || "No title",
-        description: item.description || "No description",
-        price: item.price || 0,
-        duration: item.duration || "No duration",
-        lessons_in_a_week: item.lessons_in_a_week || "No lessons_in_a_week",
-        lessons_in_a_month: item.lessons_in_a_month || "No lessons_in_a_month",
-        lesson_duration: item.lesson_duration || "No lessons_duration",
+        name: item.name,
+        address: item.address,
+        call_number: item.call_number,
       }));
       setData(transformed);
       setTotal(res?.data.total);
@@ -52,23 +54,23 @@ const CourseTable: React.FC = () => {
   }, []);
 
   const handleAdd = () => {
-    setEditingCourse(null);
+    setEditingBranch(null);
     form.resetFields();
     setIsModalOpen(true);
   };
 
-  const handleEdit = (record: Course) => {
-    setEditingCourse(record);
+  const handleEdit = (record: Branch) => {
+    setEditingBranch(record);
     form.setFieldsValue(record);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id?: number) => {
+  const handleDelete = async (id: number) => {
     try {
-      await courseService.deleteCourse(id!);
-      message.success("O'chirildi");
+      await branchService.deleteBranch(id);
+      message.success("Filial o'chirildi");
       getData(currentPage, pageSize);
-    } catch {
+    } catch (err) {
       message.error("O'chirishda xatolik yuz berdi");
     }
   };
@@ -76,28 +78,24 @@ const CourseTable: React.FC = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
-      if (editingCourse?.id) {
-        await courseService.updateCourse(values, editingCourse.id);
-        message.success("Yangilandi");
+      if (editingBranch?.id) {
+        await branchService.updateBranch(values, editingBranch.id);
+        message.success("Filial yangilandi");
       } else {
-        await courseService.createCourse(values);
-        message.success("Qo'shildi");
+        await branchService.createBranch(values);
+        message.success("Filial qo‘shildi");
       }
       setIsModalOpen(false);
       getData(currentPage, pageSize);
     } catch (err) {
-      console.log("Form xatolik:", err);
+      message.error("Formani to‘g‘ri to‘ldiring");
     }
   };
 
-  const columns: TableColumnsType<Course> = [
-    { title: "Name", dataIndex: "title" },
-    { title: "Desc", dataIndex: "description" },
-    { title: "Price", dataIndex: "price" },
-    { title: "Duration", dataIndex: "duration" },
-    { title: "Lessons In Week", dataIndex: "lessons_in_a_week" },
-    { title: "Lessons In Month", dataIndex: "lessons_in_a_month" },
-    { title: "Lesson Duration", dataIndex: "lesson_duration" },
+  const columns: TableColumnsType<Branch> = [
+    { title: "Name", dataIndex: "name" },
+    { title: "Address", dataIndex: "address" },
+    { title: "Call Number", dataIndex: "call_number" },
     {
       title: "Actions",
       render: (_, record) => (
@@ -117,11 +115,11 @@ const CourseTable: React.FC = () => {
 
   return (
     <>
-      <Divider>Course Table</Divider>
+      <Divider>Branch Table</Divider>
       <Button type="primary" onClick={handleAdd} style={{ marginBottom: 16 }}>
-        Add Course
+        Add Branch
       </Button>
-      <Table<Course>
+      <Table<Branch>
         columns={columns}
         dataSource={data}
         loading={loading}
@@ -134,16 +132,15 @@ const CourseTable: React.FC = () => {
           },
         }}
       />
-
-      <CourseModal
+      <BranchModal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={handleModalOk}
         form={form}
-        isEditing={!!editingCourse}
+        isEditing={!!editingBranch}
       />
     </>
   );
 };
 
-export default CourseTable;
+export default BranchTable;

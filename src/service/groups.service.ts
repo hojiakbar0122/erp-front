@@ -9,7 +9,7 @@ export const groupService = {
     },
 
     async createGroup(model:Group):Promise<any>{
-        const res = await apiConfig().getRequest(ApiUrls.GROUPS, model)
+        const res = await apiConfig().postRequest(ApiUrls.GROUPS, model)
         return res
     },
     async updateGroup(model:Group, id:number):Promise<any>{
