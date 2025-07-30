@@ -7,9 +7,17 @@ interface Props {
   onOk: () => void;
   form: any;
   isEditing?: boolean;
+  confirmLoading?: boolean; // ✅ loading props qo‘shildi
 }
 
-const BranchModal: React.FC<Props> = ({ open, onCancel, onOk, form, isEditing }) => {
+const BranchModal: React.FC<Props> = ({
+  open,
+  onCancel,
+  onOk,
+  form,
+  isEditing,
+  confirmLoading,
+}) => {
   return (
     <Modal
       title={isEditing ? "Edit Branch" : "Add Branch"}
@@ -17,6 +25,7 @@ const BranchModal: React.FC<Props> = ({ open, onCancel, onOk, form, isEditing })
       onCancel={onCancel}
       onOk={onOk}
       okText={isEditing ? "Update" : "Create"}
+      confirmLoading={confirmLoading} // ✅ loading ishlatilmoqda
     >
       <Form form={form} layout="vertical">
         <Form.Item name="name" label="Branch Name" rules={[{ required: true }]}>

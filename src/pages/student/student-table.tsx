@@ -35,6 +35,8 @@ const StudentTable: React.FC = () => {
     setLoading(true);
     try {
       const res = await studentService.getStudent({ page, limit });
+      console.log(res);
+      
       const transformed = res?.data.data.map((item: any) => ({
         ...item,
         date_of_birth: item.date_of_birth,
@@ -52,7 +54,7 @@ const StudentTable: React.FC = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize);
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleAdd = () => {
     setEditingStudent(null);
@@ -71,6 +73,8 @@ const StudentTable: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
+        console.log(id);
+        
       await studentService.deleteStudent(id);
       message.success("Talaba o‘chirildi");
       getData(currentPage, pageSize);
@@ -88,6 +92,7 @@ const StudentTable: React.FC = () => {
         await studentService.updateStudent(values, editingStudent.id);
         message.success("Talaba yangilandi");
       } else {
+        console.log(values);
         await studentService.createStudent(values);
         message.success("Talaba qo‘shildi");
       }
@@ -134,13 +139,17 @@ const StudentTable: React.FC = () => {
         dataSource={data}
         loading={loading}
         pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: total,
-          onChange: (page, size) => {
-            getData(page, size);
-          },
-        }}
+    current: currentPage,
+    pageSize: pageSize,
+    total: total,
+    showSizeChanger: true,
+    pageSizeOptions: ["5", "10", "20", "50"],
+    onChange: (page, size) => {
+      setCurrentPage(page);
+      setPageSize(size);
+    },
+  }}
+        style={{paddingBottom:50}}
       />
 
       <StudentModal

@@ -8,72 +8,47 @@ import {
   ReadOutlined,
   BranchesOutlined,
 } from "@ant-design/icons";
-import { Button, Menu } from "antd";
-import type { MenuProps } from "antd";
-import Groups from "../groups/groups";
-import Course from "../course/course";
-import Teacher from "../teacher/teacher";
-import Student from "../student/student";
-import Branch from "../branch/branch";
+import { Button } from "antd";
+import { Link } from "react-router-dom";
 
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = {
+  id: number;
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+};
 
 const items: MenuItem[] = [
-  {
-    key: "groups",
-    icon: <TeamOutlined />,
-    label: "Groups",
-  },
-  {
-    key: "courses",
-    icon: <BookOutlined />,
-    label: "Courses",
-  },
-  {
-    key: "teachers",
-    icon: <UserOutlined />,
-    label: "Teachers",
-  },
-  {
-    key: "students",
-    icon: <ReadOutlined />,
-    label: "Students",
-  },
-  {
-    key: "branches",
-    icon: <BranchesOutlined />,
-    label: "Branches",
-  },
+  { id: 1, key: "groups", icon: <TeamOutlined />, label: "Groups" },
+  { id: 2, key: "courses", icon: <BookOutlined />, label: "Courses" },
+  { id: 3, key: "teachers", icon: <UserOutlined />, label: "Teachers" },
+  { id: 4, key: "students", icon: <ReadOutlined />, label: "Students" },
+  { id: 5, key: "branches", icon: <BranchesOutlined />, label: "Branches" },
 ];
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("groups");
 
-  // ✅ Refreshdan keyin oxirgi tanlangan sahifani tiklash
   useEffect(() => {
     const savedKey = localStorage.getItem("selected_menu_key");
-    if (savedKey) {
-      setSelectedKey(savedKey);
-    }
+    if (savedKey) setSelectedKey(savedKey);
   }, []);
 
-  const toggleCollapsed = () => {
-    setCollapsed(!collapsed);
-  };
+  const toggleCollapsed = () => setCollapsed(!collapsed);
 
-  const handleMenuClick: MenuProps["onClick"] = (e) => {
-    setSelectedKey(e.key);
-    localStorage.setItem("selected_menu_key", e.key); // 🔐 Tanlovni saqlab qo'yish
+  const handleClick = (key: string) => {
+    setSelectedKey(key);
+    localStorage.setItem("selected_menu_key", key);
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", position: "fixed", width: "100%" }}>
-      {/* Sidebar */}
+    <div style={{ display: "flex", height: "100vh" }}>
       <div
         style={{
-          width: collapsed ? 80 : 256,
+          width: collapsed ? 80 : 220,
           backgroundColor: "#001529",
+          color: "white",
           display: "flex",
           flexDirection: "column",
         }}
@@ -84,34 +59,32 @@ const App: React.FC = () => {
           </Button>
         </div>
 
-        <Menu
-          selectedKeys={[selectedKey]}
-          mode="inline"
-          theme="dark"
-          inlineCollapsed={collapsed}
-          items={items}
-          onClick={handleMenuClick}
-          style={{ flexGrow: 1 }}
-        />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {items.map((item) => (
+            <Link
+              to={`${item.key}`}
+              key={item.key}
+              onClick={() => handleClick(item.key)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 20px",
+                color: selectedKey === item.key ? "#1890ff" : "#fff",
+                backgroundColor: selectedKey === item.key ? "#e6f7ff" : "transparent",
+                fontWeight: selectedKey === item.key ? "bold" : "normal",
+                textDecoration: "none",
+                transition: "all 0.3s",
+              }}
+            >
+              {item.icon}
+              {!collapsed && item.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      {/* Content */}
-      <div
-        style={{
-          flexGrow: 1,
-          backgroundColor: "#f0f2f5",
-          padding: 24,
-          overflowY: "auto",
-          // marginLeft: collapsed ? 80 : 256,
-          transition: "margin-left 0.3s ease",
-        }}
-      >
-        {selectedKey === "groups" && <Groups />}
-        {selectedKey === "courses" && <Course />}
-        {selectedKey === "teachers" && <Teacher />}
-        {selectedKey === "students" && <Student />}
-        {selectedKey === "branches" && <Branch />}
-      </div>
+    
     </div>
   );
 };

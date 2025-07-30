@@ -6,16 +6,40 @@ import Signout from "../auth/signout";
 
 const Admin = () => {
   return (
-    <div >
+    < >
       {/* <Layout> */}
         <Header style={{ background: "#001529", color: "white", display:"flex", alignItems:"baseline", justifyContent:"space-between"}}>
-          <h1>ERP Admin</h1>
+          <h1 style={{marginLeft:-25}}>CRM Admin</h1>
           <Signout/>
         </Header>
       {/* </Layout> */}
-      <Sidebar />
+       <div      style={{
+        display: "flex",
+        height: "100vh",
+        position: "fixed",
+        width: "100%",
+      }}>
+
+      <Sidebar  />
+
+      <div style={{
+          flexGrow: 1,
+          backgroundColor: "#f0f2f5",
+          padding: 25,
+          overflowY: "auto",
+          transition: "margin-left 0.3s ease",
+        }}>
       <Outlet />
-    </div>
+      </div>
+      </div>
+      
+   </>
+
+
+   
+
+
+
   );
 };
 

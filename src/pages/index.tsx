@@ -7,6 +7,7 @@ const StudentLayout = lazy(() => import("./student/student"));
 const TeacherLayout = lazy(() => import("./teacher/teacher"));
 const AdminLayout = lazy(() => import("./admin-layout/admin"));
 const Groups = lazy(() => import("./groups/groups"));
+const Group = lazy(() => import("./groups/single-group"));
 const Course = lazy(() => import("./course/course"));
 const LayoutProtected = lazy(() => import("./protect-routes/layout-protect"));
 const LoginProtected = lazy(() => import("./protect-routes/login-protect"));
@@ -21,6 +22,7 @@ export {
   TeacherLayout,
   AdminLayout,
   Groups,
+  Group,
   LayoutProtected,
   LoginProtected,
   Worker,

@@ -31,6 +31,8 @@ const TeacherTable: React.FC = () => {
     setLoading(true);
     try {
       const res = await teacherService.getTeacher({ page, limit });
+      console.log(res);
+      
       const transformed = res?.data.data.map((item: any) => ({
         id: item.id,
         first_name: item.first_name,
@@ -53,7 +55,7 @@ const TeacherTable: React.FC = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize);
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleAdd = () => {
     setEditingTeacher(null);
@@ -130,13 +132,17 @@ const TeacherTable: React.FC = () => {
         dataSource={data}
         loading={loading}
         pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: total,
-          onChange: (page, size) => {
-            getData(page, size);
-          },
-        }}
+    current: currentPage,
+    pageSize: pageSize,
+    total: total,
+    showSizeChanger: true,
+    pageSizeOptions: ["5", "10", "20", "50"],
+    onChange: (page, size) => {
+      setCurrentPage(page);
+      setPageSize(size);
+    },
+  }}
+        style={{paddingBottom:50}}
       />
 
       <TeacherModal

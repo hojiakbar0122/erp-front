@@ -8,6 +8,11 @@ export const groupService = {
         return res
     },
 
+    async getGroup(id:number){
+        const res = await apiConfig().getRequest(`${ApiUrls.GROUPS}/${id}`)        
+        return res
+    },
+
     async createGroup(model:Group):Promise<any>{
         const res = await apiConfig().postRequest(ApiUrls.GROUPS, model)
         return res

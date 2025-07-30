@@ -7,6 +7,7 @@ const Signout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
+    localStorage.removeItem("selected_menu_key");
     navigate("/");
   };
 

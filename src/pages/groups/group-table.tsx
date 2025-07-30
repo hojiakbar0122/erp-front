@@ -8,6 +8,8 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import GroupModal from "./group-modal";
 import dayjs from "dayjs";
 import { Tag } from "antd";
+import { Link } from "react-router-dom";
+import { EyeOutlined } from "@ant-design/icons"
 
 interface DataType {
   id: number;
@@ -29,15 +31,18 @@ const GroupTable: React.FC = () => {
 
   // ✅ Pagination holati
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
 
   const getData = async (page = 1, limit = 10) => {
     setLoading(true);
     try {
       const res = await groupService.getGroups({ page, limit }); // ← query bilan
+      console.log(res);
+      
       
       const transformed = res?.data.data.map((item: any, index: number) => ({
+        key: item.id || index, 
         id: item.id || index,
         name: item.name || "No name",
         start_date: item.start_date || "No start date",
@@ -182,6 +187,10 @@ const GroupTable: React.FC = () => {
               <RiDeleteBin5Fill />
             </Button>
           </Popconfirm>
+          <Link to={`/admin/groups/${record.id}`}>
+            <Button icon={<EyeOutlined />} type="link">
+            </Button>
+          </Link>
         </Space>
       ),
     },
@@ -218,7 +227,7 @@ const GroupTable: React.FC = () => {
     },
   }}
         size="middle"
-      />
+      style={{paddingBottom:50}}/>
 
       <GroupModal
         open={isModalOpen}

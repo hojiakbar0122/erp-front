@@ -4,14 +4,8 @@ import type { TableColumnsType } from "antd";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import BranchModal from "./branch-modal";
-import { branchService } from "@service"; // Sizda mavjud branchService bo'lishi kerak
-
-interface Branch {
-  id: number;
-  name: string;
-  address: string;
-  call_number: string;
-}
+import { branchService } from "@service";
+import type { Branch } from "../../types";
 
 const BranchTable: React.FC = () => {
   const [data, setData] = useState<Branch[]>([]);
@@ -19,25 +13,26 @@ const BranchTable: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [form] = Form.useForm();
+  const [modalLoading, setModalLoading] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [total, setTotal] = useState(0);
 
-  const getData = async (page = 1, limit = 10) => {
+  const getData = async (page = 1, limit = 5) => {
     setLoading(true);
     try {
       const res = await branchService.getBranches({ page, limit });
-      console.log(res);
-      
+
       const transformed = res?.data.branch.map((item: any, index: number) => ({
-        key:index,
+        key: index,
         id: item.id,
         name: item.name,
         address: item.address,
         call_number: item.call_number,
       }));
+
       setData(transformed);
       setTotal(res?.data.total);
       setCurrentPage(res?.data.page);
@@ -51,7 +46,7 @@ const BranchTable: React.FC = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize);
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleAdd = () => {
     setEditingBranch(null);
@@ -76,19 +71,33 @@ const BranchTable: React.FC = () => {
   };
 
   const handleModalOk = async () => {
+    setModalLoading(true);
     try {
       const values = await form.validateFields();
+      console.log(editingBranch);
+      
       if (editingBranch?.id) {
+        console.log("Editing branch ID:", editingBranch?.id);
+        console.log("Payload:", values);
+
         await branchService.updateBranch(values, editingBranch.id);
         message.success("Filial yangilandi");
       } else {
         await branchService.createBranch(values);
         message.success("Filial qo‘shildi");
       }
-      setIsModalOpen(false);
+
+      setIsModalOpen(false); // Faqat muvaffaqiyatli bo‘lsa yopiladi
       getData(currentPage, pageSize);
-    } catch (err) {
-      message.error("Formani to‘g‘ri to‘ldiring");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      if (Array.isArray(msg)) {
+        msg.forEach((m) => message.error(m));
+      } else {
+        message.error(msg || "Formani to‘g‘ri to‘ldiring");
+      }
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -127,10 +136,14 @@ const BranchTable: React.FC = () => {
           current: currentPage,
           pageSize: pageSize,
           total: total,
+          showSizeChanger: true,
+          pageSizeOptions: ["5", "10", "20", "50"],
           onChange: (page, size) => {
-            getData(page, size);
+            setCurrentPage(page);
+            setPageSize(size);
           },
         }}
+        style={{paddingBottom:50}}
       />
       <BranchModal
         open={isModalOpen}
@@ -138,6 +151,7 @@ const BranchTable: React.FC = () => {
         onOk={handleModalOk}
         form={form}
         isEditing={!!editingBranch}
+        confirmLoading={modalLoading} // bu ham qo‘shildi
       />
     </>
   );

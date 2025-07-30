@@ -129,10 +129,14 @@ const CourseTable: React.FC = () => {
           current: currentPage,
           pageSize: pageSize,
           total: total,
+          showSizeChanger: true,
+          pageSizeOptions: ["5", "10", "20", "50"],
           onChange: (page, size) => {
-            getData(page, size);
+            setCurrentPage(page);
+            setPageSize(size);
           },
         }}
+        style={{paddingBottom:50}}
       />
 
       <CourseModal
