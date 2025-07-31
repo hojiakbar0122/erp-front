@@ -13,6 +13,16 @@ export const groupService = {
         return res
     },
 
+    async getGroupTeachers(id:number){
+        const res = await apiConfig().getRequest(`${ApiUrls.GROUP_TEACHERS_BY_GROUP_ID}/${id}`)        
+        return res
+    },
+
+    async getGroupStudents(id:number){
+        const res = await apiConfig().getRequest(`${ApiUrls.GROUP_STUDENTS_BY_GROUP_ID}/${id}`)        
+        return res
+    },
+
     async createGroup(model:Group):Promise<any>{
         const res = await apiConfig().postRequest(ApiUrls.GROUPS, model)
         return res
@@ -24,6 +34,14 @@ export const groupService = {
     async deleteGroup(id:number):Promise<any>{
         const res = await apiConfig().deleteRequest(`${ApiUrls.GROUPS}/${id}`)
         return res
-    }
+    },
+    async addTeacherToGroup(data:object):Promise<any>{
+        const res = await apiConfig().postRequest(ApiUrls.GROUP_TEACHERS, data)
+        return res
+    },
+    async addStudentToGroup(data:object):Promise<any>{
+        const res = await apiConfig().postRequest(ApiUrls.GROUP_STUDENTS, data)
+        return res
+    },
     
 }

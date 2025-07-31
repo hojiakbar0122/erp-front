@@ -54,6 +54,7 @@ const SignIn = () => {
   return (
     <div style={{ maxWidth: 400, margin: "100px auto" }}>
       <Card style={{ padding: 24, borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+        <h1 style={{marginLeft:115, marginBottom:10}}>login</h1>
         <Form layout="vertical" onFinish={handleSubmit(submit)}>
           <Form.Item
             label="Email"

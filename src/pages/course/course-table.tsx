@@ -8,6 +8,7 @@ import CourseModal from "./course-modal";
 import type { Course } from "../../types/course";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
+import { Tooltip } from "antd";
 
 const CourseTable: React.FC = () => {
   const [data, setData] = useState<Course[]>([]);
@@ -92,7 +93,16 @@ const CourseTable: React.FC = () => {
 
   const columns: TableColumnsType<Course> = [
     { title: "Name", dataIndex: "title" },
-    { title: "Desc", dataIndex: "description" },
+    {
+  title: "Desc",
+  dataIndex: "description",
+  ellipsis: true,
+  render: (desc: string) => (
+    <Tooltip placement="topLeft" title={desc}>
+      {desc.length > 50 ? `${desc.slice(0, 50)}...` : desc}
+    </Tooltip>
+  ),
+},
     { title: "Price", dataIndex: "price" },
     { title: "Duration", dataIndex: "duration" },
     { title: "Lessons In Week", dataIndex: "lessons_in_a_week" },

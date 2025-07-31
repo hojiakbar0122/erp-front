@@ -4,8 +4,8 @@ import type { TableColumnsType } from "antd";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import BranchModal from "./branch-modal";
-import { branchService } from "@service";
-import type { Branch } from "../../types";
+import { branchService, teacherService } from "@service"; // 🔥 teacherService ham qo‘shildi
+import type { Branch} from "../../types";
 
 const BranchTable: React.FC = () => {
   const [data, setData] = useState<Branch[]>([]);
@@ -14,6 +14,18 @@ const BranchTable: React.FC = () => {
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [form] = Form.useForm();
   const [modalLoading, setModalLoading] = useState(false);
+
+  // Teachers
+  const [teachers, setTeachers] = useState<any>([]);
+
+  const getTeachers = async () => {
+    try {
+      const res = await teacherService.getTeacher({});
+      setTeachers(res?.data?.teacher || []);
+    } catch (err) {
+      console.error("O‘qituvchilarni olishda xatolik:", err);
+    }
+  };
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,6 +43,7 @@ const BranchTable: React.FC = () => {
         name: item.name,
         address: item.address,
         call_number: item.call_number,
+        teachers: item.teachers || [],
       }));
 
       setData(transformed);
@@ -46,6 +59,7 @@ const BranchTable: React.FC = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize);
+    getTeachers(); // 🔥 o‘qituvchilarni olish
   }, [currentPage, pageSize]);
 
   const handleAdd = () => {
@@ -56,7 +70,12 @@ const BranchTable: React.FC = () => {
 
   const handleEdit = (record: Branch) => {
     setEditingBranch(record);
-    form.setFieldsValue(record);
+
+    form.setFieldsValue({
+      ...record,
+      teacherIds: record.teachers?.map((t: any) => t.id) || [], // 🔥 o‘qituvchilarni formga set qilish
+    });
+
     setIsModalOpen(true);
   };
 
@@ -74,12 +93,8 @@ const BranchTable: React.FC = () => {
     setModalLoading(true);
     try {
       const values = await form.validateFields();
-      console.log(editingBranch);
-      
-      if (editingBranch?.id) {
-        console.log("Editing branch ID:", editingBranch?.id);
-        console.log("Payload:", values);
 
+      if (editingBranch?.id) {
         await branchService.updateBranch(values, editingBranch.id);
         message.success("Filial yangilandi");
       } else {
@@ -87,7 +102,7 @@ const BranchTable: React.FC = () => {
         message.success("Filial qo‘shildi");
       }
 
-      setIsModalOpen(false); // Faqat muvaffaqiyatli bo‘lsa yopiladi
+      setIsModalOpen(false);
       getData(currentPage, pageSize);
     } catch (err: any) {
       const msg = err?.response?.data?.message;
@@ -106,13 +121,24 @@ const BranchTable: React.FC = () => {
     { title: "Address", dataIndex: "address" },
     { title: "Call Number", dataIndex: "call_number" },
     {
+    title: "Teachers",
+    dataIndex: "teachers",
+    render: (teachers: any[]) =>
+      teachers.length > 0
+        ? teachers.map((t) => `${t.first_name} ${t.last_name}`).join(", ")
+        : <span style={{ color: "#999" }}>Biriktirilmagan</span>,
+    },
+    {
       title: "Actions",
       render: (_, record) => (
         <Space>
           <Button type="link" onClick={() => handleEdit(record)}>
             <FaEdit />
           </Button>
-          <Popconfirm title="Ishonchingiz komilmi?" onConfirm={() => handleDelete(record.id)}>
+          <Popconfirm
+            title="Ishonchingiz komilmi?"
+            onConfirm={() => handleDelete(record.id)}
+          >
             <Button type="link" danger>
               <RiDeleteBin5Fill />
             </Button>
@@ -143,7 +169,7 @@ const BranchTable: React.FC = () => {
             setPageSize(size);
           },
         }}
-        style={{paddingBottom:50}}
+        style={{ paddingBottom: 50 }}
       />
       <BranchModal
         open={isModalOpen}
@@ -151,7 +177,8 @@ const BranchTable: React.FC = () => {
         onOk={handleModalOk}
         form={form}
         isEditing={!!editingBranch}
-        confirmLoading={modalLoading} // bu ham qo‘shildi
+        confirmLoading={modalLoading}
+        teachers={teachers} // 🔥 Yangi prop uzatildi
       />
     </>
   );

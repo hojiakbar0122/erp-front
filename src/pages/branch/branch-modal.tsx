@@ -1,5 +1,8 @@
+// BranchModal.tsx
+
 import React from "react";
-import { Form, Input, Modal } from "antd";
+import { Form, Input, Modal, Select } from "antd";
+// import type { Teacher } from "../../types"; // Agar kerak bo‘lsa
 
 interface Props {
   open: boolean;
@@ -7,7 +10,8 @@ interface Props {
   onOk: () => void;
   form: any;
   isEditing?: boolean;
-  confirmLoading?: boolean; // ✅ loading props qo‘shildi
+  confirmLoading?: boolean;
+  teachers: any; // 🔥 qo‘shildi
 }
 
 const BranchModal: React.FC<Props> = ({
@@ -17,6 +21,7 @@ const BranchModal: React.FC<Props> = ({
   form,
   isEditing,
   confirmLoading,
+  teachers,
 }) => {
   return (
     <Modal
@@ -25,7 +30,7 @@ const BranchModal: React.FC<Props> = ({
       onCancel={onCancel}
       onOk={onOk}
       okText={isEditing ? "Update" : "Create"}
-      confirmLoading={confirmLoading} // ✅ loading ishlatilmoqda
+      confirmLoading={confirmLoading}
     >
       <Form form={form} layout="vertical">
         <Form.Item name="name" label="Branch Name" rules={[{ required: true }]}>
@@ -38,6 +43,21 @@ const BranchModal: React.FC<Props> = ({
 
         <Form.Item name="call_number" label="Phone Number" rules={[{ required: true }]}>
           <Input placeholder="Masalan: +998901234567" />
+        </Form.Item>
+
+        <Form.Item name="teacherIds" label="Teachers">
+          <Select
+            mode="multiple"
+            placeholder="O‘qituvchilarni tanlang"
+            allowClear
+          >
+            console.log(teachers);
+            {teachers.map((teacher:any) => (
+              <Select.Option key={teacher.id} value={teacher.id}>
+                {teacher.first_name} {teacher.last_name}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
       </Form>
     </Modal>
