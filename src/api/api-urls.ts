@@ -17,6 +17,15 @@ export class ApiUrls{
     // STUDENTS
     public static STUDENTS:string="/students"
 
+    // ADMIN
+    public static ADMIN:string="/admin"
+
+    // ADMIN_PROFILE
+    public static ADMIN_PROFILE:string="/admin/profile"
+
+    // ADMIN_CHANGE_PASSWORD
+    public static ADMIN_CHANGE_PASSWORD:string="/admin/change-password"
+
     // GROUP TEACHERS
     public static GROUP_TEACHERS: string = "/group-teachers";
     public static GROUP_TEACHERS_BY_GROUP_ID: string = this.GROUP_TEACHERS + "/by-group";
